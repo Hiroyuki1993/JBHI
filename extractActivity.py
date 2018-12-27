@@ -11,6 +11,7 @@ def extractActivities(activity, row):
     return activities
 
 def main():
+    rows = []
     participants = pd.read_csv('./MDD_data/EMA_data_all participants.csv')
     participants['time'] = pd.to_datetime(participants.time)
 
@@ -25,9 +26,18 @@ def main():
         folder = "./MDD_data/Activity_Data/patient{}".format(ID)
         os.makedirs(folder, exist_ok=True)
         for rownum, (key, row) in enumerate(patient.iterrows(), 1):
+            total_dep = row.total_dep
+            fatigue = row.fatigue
+            unconcentration = row.not_concentrating
+            forgetful = row.forgetful
+            headache = row.headache
+            sleepiness = row.sleepiness
+            total_anxiety = row.total_anxiety
+            positive_mood = row.positive_mood
+            negative_mood = row.negative_mood
             activities_cut = extractActivities(activity, row)
-            # skip sleep period
-            if len(activities_cut) == 0 or row.prevous_schedule == 1:
+            # skip sleep or no-depression period
+            if len(activities_cut) == 0 or row.prevous_schedule == 1 or total_dep != total_dep:
                 continue
             else:
                 # cut in zero sequence
@@ -39,13 +49,21 @@ def main():
                 num_off = 0
                 for num_off, match in enumerate(matches):
                     end = match.start()
-                    # if data lentgh is too short, we don't generate csv file.
+                    # if data lentgh is too short, we don't generate row.
                     if abs(end - start) < 10:
+                        start = match.end()
                         continue
-                    activities_cut[start:end].to_csv(folder + "/activity_{}_{}.csv".format(rownum, num_off))
+                    act_str = " ".join(activities_cut[start:end].astype(str))
+                    rows.append([ID, act_str, total_dep, fatigue, unconcentration, forgetful, headache, sleepiness, total_anxiety, positive_mood, negative_mood])
                     start = match.end()
-                num_off += 1
-                activities_cut[start:].to_csv(folder + "/activity_{}_{}.csv".format(rownum, num_off))
+                if(len(activities_cut[start:]) > 10):
+                    num_off += 1
+                    act_str = " ".join(activities_cut[start:].astype(str))
+                    rows.append([ID, act_str, total_dep, fatigue, unconcentration, forgetful, headache, sleepiness, total_anxiety, positive_mood, negative_mood])
+                # rows.append([ID, act_str, total_dep])
+    result = pd.DataFrame(rows, columns=['patient_id', 'activities', 'total_dep', 'fatigue', 'unconcentration', 'forgetful', 'headache', 'sleepiness', 'total_anxiety', 'positive_mood', 'negative_mood'])
+    # result = pd.DataFrame(rows, columns=['patient_id', 'activities', 'total_dep'])
+    result.to_csv('result.csv', index=False)
 
 if __name__ == "__main__":
     main()
