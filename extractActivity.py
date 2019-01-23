@@ -15,12 +15,12 @@ def main():
     participants = pd.read_csv('./MDD_data/EMA_data_all participants.csv')
     participants['time'] = pd.to_datetime(participants.time)
 
-    activity_files = glob.glob("./MDD_data/Activity_Data/*.csv")
+    activity_files = glob.glob("./MDD_data/Activity_Data/7*.csv")
     for fname in activity_files:
         print(fname)
         ID = int(re.sub(r'\D', '', fname))
         patient = participants[participants.ID == ID].copy()
-        patient['start_time'] = patient.time - pd.Timedelta(minutes = 30)
+        patient['start_time'] = patient.time - pd.Timedelta(hours = 3)
         patient['prevous_schedule'] = patient.shift().schedule
         activity = pd.read_csv(fname, index_col=0, parse_dates=True).sort_index()
         for rownum, (key, row) in enumerate(patient.iterrows(), 1):
@@ -35,7 +35,7 @@ def main():
             negative_mood = row.negative_mood
             activities_cut = extractActivities(activity, row)
             # skip sleep or no-depression period
-            if len(activities_cut) != 30 or row.prevous_schedule == 1 or total_dep != total_dep:
+            if len(activities_cut) < 150 or row.prevous_schedule == 1 or total_dep != total_dep:
                 continue
             else:
                 act_str = " ".join(activities_cut.astype(str))
