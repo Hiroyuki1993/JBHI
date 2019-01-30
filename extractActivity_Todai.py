@@ -18,14 +18,18 @@ def main():
         participants_year = participants[participants.year == year]
         if year == 2011:
             activities = pd.read_csv("./Todai_office_workers_data/Activity_data/todai_activity_2011.csv", names=["ID", "datetime", "activity"], skiprows=1)
+            exclude_id = [11,15, 22, 25, 30, 31]
         else:
             activities = pd.read_csv("./Todai_office_workers_data/Activity_data/todai_activity_2012.csv", names=["ID", "datetime", "activity"], skiprows=1)
+            exclude_id = [10,14,17,29,26,35,38,49,52,32]
         activities['datetime'] = pd.to_datetime(activities.datetime, format="%d%b%y:%H:%M")
         activities.set_index("datetime", inplace=True)
         activities = activities.sort_index()
 
         N = max(participants_year.ID)
         for ID in range(1, N+1):
+            if ID in exclude_id:
+                continue
             print(year, ID)
             subject = participants_year[participants_year.ID == ID]
             activity = activities[activities.ID == ID]
