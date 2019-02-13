@@ -3,3 +3,5 @@ Todai_office_workers_data/*
 .ipynb_checkpoints/
 *.csv
 *.ipynb
+.Rproj.user
+*.Rproj
