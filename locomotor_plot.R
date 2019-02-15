@@ -14,4 +14,4 @@ EMA.fill = read_csv("./EMA_fill.csv") # It requires some manual labor to transfo
 
 ggplot() + geom_area(data = EMA.fill, aes(x = time, y = ymax), fill = "gray") + 
   geom_bar(data = activity.oneday, aes(x = time, y = `Activity counts per minute`), stat = "identity", fill = "black") +
-   theme_classic(base_size = 18) + ylab("Activity counts per minute") + scale_x_datetime(date_breaks = "3 hour", date_labels = "%H:%M")
+   theme_classic(base_size = 24) + ylab("Zero-Crossing Counts\n Per Minute") + scale_x_datetime(date_breaks = "3 hour", date_labels = "%H:%M") + xlab("Time")
