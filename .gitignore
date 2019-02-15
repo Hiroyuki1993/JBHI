@@ -5,3 +5,7 @@ Todai_office_workers_data/*
 *.ipynb
 .Rproj.user
 *.Rproj
+*.zip
+*.png
+*.pdf
+.Rhistory
