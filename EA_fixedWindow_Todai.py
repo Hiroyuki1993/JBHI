@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+import re
 
 def calc_awake_period(EMA_records):
     data = EMA_records[(EMA_records.type_of_record == "awake") | (EMA_records.type_of_record == "sleep")]
@@ -27,12 +28,17 @@ def extractActivities(activity, period_awake, ID, window_min):
         start_time = row.awake
         while start_time < (row.sleep - pd.Timedelta(minutes = window_min)):
             end_time = start_time + pd.Timedelta(minutes = window_min)
-            act_extracted = activity[start_time:end_time].activity.astype(str)
+            act_extracted = activity[start_time:end_time].activity
+            act_extracted = act_extracted[act_extracted.notnull()].astype(int).astype(str)
             start_time = end_time
             if (len(act_extracted) < window_min):
                 print("length is not enough")
                 continue
-            act_list.append(" ".join(act_extracted))
+            act_string = " ".join(act_extracted)
+            if(re.search(" 0 0 0 0 0", act_string)):
+                print("too many zero sequences")
+                continue
+            act_list.append(act_string)
     return pd.DataFrame({"ID": ID, "activities": act_list})
 
 def main():
