@@ -27,7 +27,7 @@ def extractActivities(activity, period_awake, ID, window_min):
     for key, row in period_awake.iterrows():
         start_time = row.awake
         while start_time < (row.sleep - pd.Timedelta(minutes = window_min)):
-            end_time = start_time + pd.Timedelta(minutes = window_min)
+            end_time = start_time + pd.Timedelta(minutes = window_min -1) 
             act_extracted = activity[start_time:end_time].Activity
             act_extracted = act_extracted[act_extracted.notnull()].astype(int).astype(str)
             start_time = end_time
@@ -42,7 +42,7 @@ def extractActivities(activity, period_awake, ID, window_min):
     return pd.DataFrame({"ID": ID, "activities": act_list})
 
 def main():
-    window_min = 180
+    window_min = 60
 
     participants = pd.read_csv('./MDD_data/EMA_data_all participants.csv')
     df_list = []
