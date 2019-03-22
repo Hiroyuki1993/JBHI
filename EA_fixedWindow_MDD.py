@@ -28,21 +28,22 @@ def extractActivities(activity, period_awake, ID, window_min):
         start_time = row.awake
         while start_time < (row.sleep - pd.Timedelta(minutes = window_min)):
             end_time = start_time + pd.Timedelta(minutes = window_min -1) 
-            act_extracted = activity[start_time:end_time].Activity
+            end_time_buffer = end_time + pd.Timedelta(seconds = 1)
+            act_extracted = activity[start_time:end_time_buffer].Activity
             act_extracted = act_extracted[act_extracted.notnull()].astype(int).astype(str)
             start_time = end_time
             if (len(act_extracted) < window_min):
-                # print("length is not enough")
+                print("length is not enough", start_time)
                 continue
             act_string = " ".join(act_extracted)
             if(re.search(" 0 0 0 0 0", act_string)):
-                # print("too many zero sequences")
+                print("too many zero sequences")
                 continue
             act_list.append(act_string)
     return pd.DataFrame({"ID": ID, "activities": act_list})
 
 def main():
-    window_min = 60
+    window_min = 30
 
     participants = pd.read_csv('./MDD_data/EMA_data_all participants.csv')
     df_list = []
